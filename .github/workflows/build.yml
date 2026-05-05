@@ -1,0 +1,30 @@
+name: Build
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+jobs:
+  build:
+    runs-on: windows-2019
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Setup MSBuild
+      uses: microsoft/setup-msbuild@v1
+
+    - name: Setup NuGet
+      uses: NuGet/setup-nuget@v1
+      with:
+        nuget-version: '6.x'
+
+    - name: Restore NuGet packages
+      run: nuget restore MissionPlanner.sln
+
+    - name: Build
+      working-directory: ${{ github.workspace }}
+      run: msbuild MissionPlanner.sln /p:Configuration=Release /p:Platform="Any CPU" /t:Build /m
